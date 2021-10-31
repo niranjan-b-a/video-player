@@ -1,0 +1,46 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+.anchor {
+    display: flex;
+}
+
+.video-container {
+    width: 70%;
+    padding: 10px;
+}
+
+.side-menu {
+    width: 30%;
+    height: 100vh;
+    overflow: scroll;
+}
+.side-menu-heading {
+    font-size: 20px;
+}
+.sub-menus > .outside {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    color: white;
+    background-color: #00203fe0;
+    border: 1px solid #72a6d3;
+}
+.inside {
+    padding: 10px;
+    background-color: #adefd1a3;
+    border-bottom: 1px solid black;
+}
+.inside:hover {
+    cursor: pointer;
+}
+.hide {
+    display: none;
+}
+.rotate {
+    transform: rotateX(180deg);
+    transition: all 0.5s;
+}
