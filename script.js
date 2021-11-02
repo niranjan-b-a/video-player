@@ -1,5 +1,4 @@
 const uploadedFiles = document.querySelector("#formFile");
-const pdfs = document.querySelector("#pdfs");
 const uploadForm = document.querySelector("#filesForm");
 const anchor = document.querySelector(".anchor");
 const folderName = document.querySelector(".folderName");
@@ -8,26 +7,50 @@ const videoTitle = document.querySelector(".videoTitle");
 const uploader = document.getElementById("uploader");
 const video = document.querySelector("#video");
 const videoSrc = document.querySelector(".videoSrc");
-
-/**
- * [
- *      {
- *          folder1 : [
- *          'file1','file2'
- *          ],
- *        name: 'name',
- *        completed: boolean
- *      }
- * ]
- */
-
+const navbarNamr = document.querySelector("#nacbarName");
+const addNewCourse = document.querySelector('#addNewCourse');
+const recentlyOpened = document.querySelector('#recentlyOpened');
+let recentCourseList;
+let courseName;
+let key;
+let localArr;
+let courses;
 let videoList = []; //Stores all the files
 let folderList = {}; //to get the number of folders
 let arr = []; //stores all the folders
 
+
+// format of storing video paths
+/**
+ * [
+ *    {
+ *          folder: [
+    *          {path:
+    *          name: 'name',
+    *          completed: boolean}
+ *      ], 
+ *       id: ,
+ *       name: 
+ *    }
+ * ]
+ */
+
+
+
+
 if (localStorage.getItem('currentVideo')) {
     videoSrc.src = JSON.parse(localStorage.getItem('currentVideo'));
 }
+
+
+const updateRecents = (courses) => {
+    const recentList = courses.map(course => {
+        return `<li class="recentCourseList"><a class="dropdown-item" href="#" data-coursename="${course}">${course}</a></li>`
+    }).join('');
+    recentlyOpened.innerHTML = recentList;
+    recentCourseList = document.querySelectorAll(".recentCourseList")
+}
+
 
 uploadForm.addEventListener("submit", (e) => {
     e.preventDefault();
@@ -72,13 +95,33 @@ uploadForm.addEventListener("submit", (e) => {
             );
         });
     });
-    localStorage.setItem("video", JSON.stringify(arr));
-    location.reload();
+    courseName = arr[0].folder[0].path.split("/")[0];
+    setWatching(courseName);
+    if (!(localStorage.getItem(courseName))) {
+        localStorage.setItem(courseName, JSON.stringify(arr));
+        if (!(localStorage.getItem("courses"))) {
+            courses = [courseName];
+            localStorage.setItem('courses', JSON.stringify(courses));
+        } else {
+            courses = JSON.parse(localStorage.getItem('courses'));
+            courses.push(courseName);
+            localStorage.setItem('courses', JSON.stringify(courses));
+        }
+        location.reload();
+    }
 });
+
+
+const setWatching = (courseName) => {
+    console.log(courseName);
+    localStorage.setItem("watching", courseName);
+}
+
 
 const setHtml = () => {
     let incToggle = -1;
-    let localArr = JSON.parse(localStorage.getItem("video"));
+    key = (localStorage.getItem("watching"));
+    localArr = JSON.parse(localStorage.getItem(key))
     let htmlString = localArr
         .map((ele) => {
             incToggle++;
@@ -103,6 +146,7 @@ const setHtml = () => {
     dropDown.innerHTML = htmlString;
     sideMenu();
     fun();
+    navbarName.innerText = localArr[0].folder[0].path.split("/")[0].toUpperCase();
 };
 
 const getFolder = (item) => {
@@ -160,7 +204,7 @@ const nextVideo = (e) => {
 };
 
 const completeVideo = (crtEle) => {
-    let data = JSON.parse(localStorage.getItem("video"));
+    let data = JSON.parse(localStorage.getItem(key));
     crtEle.querySelector("input").checked = true;
     let currentVideoPath = crtEle.dataset.filename;
     let folderNumber = crtEle.dataset.toggle;
@@ -171,10 +215,10 @@ const completeVideo = (crtEle) => {
             videoChecker.completed = true;
         }
     })
-    localStorage.setItem('video', JSON.stringify(data));
+    localStorage.setItem(`${localArr[0].folder[0].path.split("/")[0]}`, JSON.stringify(data));
 }
 
-if (localStorage.getItem("video")) {
+if (localStorage.getItem("watching")) {
     uploader.style.display = "none";
     anchor.style.display = "flex";
     setHtml();
@@ -187,6 +231,7 @@ if (localStorage.getItem("video")) {
         completeVideo(crtEle);
         nextVideo(e);
     });
+    updateRecents(JSON.parse(localStorage.getItem('courses')));
 }
 
 document.addEventListener('keydown', (e) => {
@@ -210,3 +255,22 @@ document.addEventListener('keydown', (e) => {
         videoSrc.requestFullscreen();
     }
 })
+
+const addNew = (e) => {
+    anchor.style.display = "none";
+    uploader.style.display = "flex";
+    videoSrc.pause();
+}
+
+addNewCourse.addEventListener("click", addNew);
+
+
+const changeCourse = (e) => {
+    setWatching(e.target.dataset.coursename);
+    location.reload();
+}
+
+
+recentCourseList.forEach(course => {
+    course.addEventListener("click", changeCourse);
+});
