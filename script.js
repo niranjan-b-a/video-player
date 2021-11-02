@@ -15,7 +15,8 @@ const videoSrc = document.querySelector(".videoSrc");
  *          folder1 : [
  *          'file1','file2'
  *          ],
- *        name: 'name'
+ *        name: 'name',
+ *        completed: boolean
  *      }
  * ]
  */
@@ -23,12 +24,16 @@ const videoSrc = document.querySelector(".videoSrc");
 let videoList = []; //Stores all the files
 let folderList = {}; //to get the number of folders
 let arr = []; //stores all the folders
+
+if (localStorage.getItem('currentVideo')) {
+    videoSrc.src = JSON.parse(localStorage.getItem('currentVideo'));
+}
+
 uploadForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
     uploader.style.display = "none";
     anchor.style.display = "flex";
-    console.log(uploadedFiles.files);
     i = 0;
     for (let iter of uploadedFiles.files) {
         let path = iter.webkitRelativePath.split("/")[1];
@@ -54,6 +59,7 @@ uploadForm.addEventListener("submit", (e) => {
             arr[fol].folder.push({
                 path: iter.webkitRelativePath,
                 name: iter.name,
+                completed: false
             });
         }
     }
@@ -80,11 +86,14 @@ const setHtml = () => {
         <div class="sub-menus">
             <div class="outside" data-toggle="${incToggle}">
                 ${ele.name}
-                <i class="fas fa-caret-up"></i>
+                <i class="fas fa-caret-down"></i>
             </div>
             ${ele.folder
                 .map((ele1) => {
-                    return `<div class="inside click hide" data-name="${ele1.name}" data-toggle="${incToggle}" data-filename="${ele1.path}">${ele1.name} </div> `;
+                    return `<div class="inside click hide" data-name="${ele1.name}" data-toggle="${incToggle}" data-filename="${ele1.path}">
+                        ${ele1.completed ? `<input type="checkbox" checked>` : `<input type="checkbox">`}
+                        ${ele1.name}
+                    </div> `;
                 })
                 .join("")}
         </div>
@@ -108,15 +117,18 @@ function fun() {
     });
 }
 function addVideo(e) {
-    console.log(e);
-    console.log(e.target ? "target" : e.dataset);
     videoSrc.dataset.currentvideo = `${
         e.target ? e.target.dataset.name : e.dataset.name
     }`;
     videoTitle.innerText = e.target
         ? e.target.dataset.name.split(".")[1]
         : e.dataset.name.split(".")[1];
-    videoSrc.src = e.target ? e.target.dataset.filename : e.dataset.filename;
+    localStorage.setItem("currentVideo", JSON.stringify(e.target ? e.target.dataset.filename : e.dataset.filename))
+    if (localStorage.getItem('currentVideo')) {
+        videoSrc.src = JSON.parse(localStorage.getItem('currentVideo'));
+    } else {
+        videoSrc.src = e.target ? e.target.dataset.filename : e.dataset.filename;
+    }
 }
 function sideMenu() {
     const outside = document.querySelectorAll(".outside");
@@ -125,7 +137,6 @@ function sideMenu() {
     });
     function toggleMenu(e) {
         const data = e.target.dataset.toggle;
-        console.log(data);
         const toggleEle = document.querySelectorAll(`[data-toggle="${data}"]`);
         const icon = e.target.children;
         icon[0].classList.toggle("rotate");
@@ -137,40 +148,65 @@ function sideMenu() {
 }
 const nextVideo = (e) => {
     let crt = e.target.dataset.currentvideo;
-    console.log(crt);
     let crtTag = document.querySelector(`[data-name="${crt}"]`);
-    console.log(crtTag);
     if (crtTag.nextElementSibling === null) {
-        console.log("entered");
-        // videoSrc.src =
-        //     crtTag.parentNode.nextElementSibling.firstElementChild.nextElementSibling.dataset.filename;
-        // videoTitle.innerText =
-        //     crtTag.parentNode.nextElementSibling.firstElementChild.nextElementSibling.dataset.name.split(
-        //         "."
-        //     )[1];
         addVideo(
             crtTag.parentNode.nextElementSibling.firstElementChild
                 .nextElementSibling
         );
     } else {
-        // videoSrc.src = crtTag.nextElementSibling.dataset.filename;
-        // videoTitle.innerText =
-        //     crtTag.nextElementSibling.dataset.name.split(".")[1];
         addVideo(crtTag.nextElementSibling);
     }
 };
 
+const completeVideo = (crtEle) => {
+    let data = JSON.parse(localStorage.getItem("video"));
+    crtEle.querySelector("input").checked = true;
+    let currentVideoPath = crtEle.dataset.filename;
+    let folderNumber = crtEle.dataset.toggle;
+    console.log(currentVideoPath, folderNumber);
+    console.log(data);
+    data[folderNumber].folder.map(videoChecker => {
+        if (videoChecker.path == currentVideoPath) {
+            videoChecker.completed = true;
+        }
+    })
+    localStorage.setItem('video', JSON.stringify(data));
+}
+
 if (localStorage.getItem("video")) {
-    console.log("first time");
     uploader.style.display = "none";
     anchor.style.display = "flex";
     setHtml();
     document.getElementById("video").addEventListener("ended", function (e) {
         // Your code goes here
-        console.log(e.target);
         let crtEle = document.querySelector(
             `[data-name="${e.target.dataset.currentvideo}"]`
         );
+        // console.log(crtEle);
+        completeVideo(crtEle);
         nextVideo(e);
     });
 }
+
+document.addEventListener('keydown', (e) => {
+    if (e.code == "ArrowLeft" || e.code == "KeyJ") {
+        videoSrc.currentTime = videoSrc.currentTime - 5;
+    }
+
+    if (e.code == "ArrowRight" || e.code == "KeyL") {
+        videoSrc.currentTime = videoSrc.currentTime + 5;
+    }
+
+    if (e.code == "Space" || e.code == "KeyK") {
+        if (videoSrc.paused == false) {
+            videoSrc.pause();
+        } else {
+            videoSrc.play();
+        }
+    }
+
+    if (e.code == "KeyF") {
+        videoSrc.requestFullscreen();
+    }
+})

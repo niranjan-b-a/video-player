@@ -31,6 +31,9 @@
 }
 .inside {
     padding: 10px;
+    display: flex;
+    /* justify-content: center; */
+    align-items: center;
     background-color: #adefd1a3;
     border-bottom: 1px solid black;
 }
@@ -43,4 +46,9 @@
 .rotate {
     transform: rotateX(180deg);
     transition: all 0.5s;
+}
+
+.inside > input {
+    margin-right: 16px;
+    margin-top: 4px;
 }
