@@ -15,6 +15,31 @@
         <script src="https://kit.fontawesome.com/402abef26d.js" crossorigin="anonymous"></script>
     </head>
     <body>
+        <header>
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                  <span class="navbar-brand" id="navbarName">Navbar</span>
+                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                  </button>
+                  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+                    <ul class="navbar-nav">
+                      <li class="nav-item">
+                        <a class="nav-link" href="#" id="addNewCourse">Add new course</a>
+                      </li>
+                      <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          Recently opened
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink" id="recentlyOpened">
+                          
+                        </ul>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </nav>
+        </header>
         <div id="uploader" class="row justify-content-center align-items-center" style="height: 100vh;">
             <div class="col-sm-12" style="width: 70%;">
                 <div class="card ">
@@ -40,9 +65,23 @@
                     <source src="" />
                 </video>
                 <h4 class="videoTitle"></h4>
+                <div class="card">
+                    <div class="form-floating">
+                        <textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea2" style="height: 100px"></textarea>
+                        <label for="floatingTextarea2">Comments</label>
+                    </div>
+                    <div class="card-body">
+                      <a href="#" class="btn btn-primary" id="saveComment">Save</a>
+                    </div>
+                  </div>
+
+
+
+
+
             </section>
             <div class="dropdown side-menu">
-                <div class="side-menu-heading">Heading</div>
+                
             </div>
         </div>
 
