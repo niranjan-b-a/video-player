@@ -11,6 +11,13 @@
     padding: 10px;
 }
 
+/* video player */
+.videoSrc {
+    background-color: black;
+    border-radius: 10px;
+}
+
+
 .side-menu {
     width: 30%;
     height: 100vh;
