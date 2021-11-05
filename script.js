@@ -123,8 +123,7 @@ const setWatching = (courseName) => {
 
 const setHtml = () => {
     let incToggle = -1;
-    key = (localStorage.getItem("watching"));
-    console.log(key);
+    key = JSON.parse(localStorage.getItem("watching"));
     localArr = JSON.parse(localStorage[key]);
     let htmlString = localArr
         .map((ele) => {
