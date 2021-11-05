@@ -8,9 +8,9 @@ const uploader = document.getElementById("uploader");
 const video = document.querySelector("#video");
 const videoSrc = document.querySelector(".videoSrc");
 const navbarName = document.querySelector("#navbarName");
-const addNewCourse = document.querySelector('#addNewCourse');
-const recentlyOpened = document.querySelector('#recentlyOpened');
-const commentArea = document.querySelector('#floatingTextarea2');
+const addNewCourse = document.querySelector("#addNewCourse");
+const recentlyOpened = document.querySelector("#recentlyOpened");
+const commentArea = document.querySelector("#floatingTextarea2");
 let recentCourseList;
 let courseName;
 let key;
@@ -20,41 +20,39 @@ let videoList = []; //Stores all the files
 let folderList = {}; //to get the number of folders
 let arr = []; //stores all the folders
 
-
 // format of storing video paths
 /**
  * [
  *    {
  *          folder: [
-    *         { path:
-    *           name: 'name',
-    *           completed: boolean
-    *           comment: "Your comments go here"}
- *      ], 
+ *         { path:
+ *           name: 'name',
+ *           completed: boolean
+ *           comment: "Your comments go here"}
+ *      ],
  *       id: ,
  *       name: section name
  *    }
  * ]
  */
 
-
-
 // saving to local storage
 const saveToLocal = (key, value) => {
     localStorage.setItem(key, JSON.stringify(value));
-}
+};
 
 // Update recent course list in dropdown
 const updateRecents = (courses) => {
-    const recentList = courses.map(course => {
-        return `<li class="recentCourseList"><a class="dropdown-item" href="#" data-coursename="${course}">${course}</a></li>`
-    }).join('');
+    const recentList = courses
+        .map((course) => {
+            return `<li class="recentCourseList"><a class="dropdown-item" href="#" data-coursename="${course}">${course}</a></li>`;
+        })
+        .join("");
     recentlyOpened.innerHTML = recentList;
-    recentCourseList = document.querySelectorAll(".recentCourseList")
-}
+    recentCourseList = document.querySelectorAll(".recentCourseList");
+};
 
-
-// upload a course 
+// upload a course
 const uploadCourse = (e) => {
     e.preventDefault();
 
@@ -85,7 +83,7 @@ const uploadCourse = (e) => {
             arr[fol].folder.push({
                 path: iter.webkitRelativePath,
                 name: iter.name,
-                completed: false
+                completed: false,
             });
         }
     }
@@ -100,31 +98,28 @@ const uploadCourse = (e) => {
     });
     courseName = arr[0].folder[0].path.split("/")[0];
     setWatching(courseName);
-    if (!(localStorage.getItem(courseName))) {
+    if (!localStorage.getItem(courseName)) {
         saveToLocal(courseName, arr);
-        if (!(localStorage.getItem("courses"))) {
+        if (!localStorage.getItem("courses")) {
             courses = [courseName];
-            saveToLocal('courses', courses);
+            saveToLocal("courses", courses);
         } else {
-            courses = JSON.parse(localStorage.getItem('courses'));
+            courses = JSON.parse(localStorage.getItem("courses"));
             courses.push(courseName);
-            saveToLocal('courses', courses);
+            saveToLocal("courses", courses);
         }
         location.reload();
     }
-}
-
+};
 
 const setWatching = (courseName) => {
-    console.log(courseName);
+    localStorage.removeItem("currentVideo");
     saveToLocal("watching", courseName);
-}
-
+};
 
 const setHtml = () => {
     let incToggle = -1;
-    key = (localStorage.getItem("watching"));
-    console.log(key);
+    key = localStorage.getItem("watching");
     localArr = JSON.parse(localStorage[key]);
     let htmlString = localArr
         .map((ele) => {
@@ -137,8 +132,14 @@ const setHtml = () => {
             </div>
             ${ele.folder
                 .map((ele1) => {
-                    return `<div class="inside click hide" data-name="${ele1.name}" data-toggle="${incToggle}" data-filename="${ele1.path}">
-                        ${ele1.completed ? `<input type="checkbox" checked>` : `<input type="checkbox">`}
+                    return `<div class="inside click hide" data-name="${
+                        ele1.name
+                    }" data-toggle="${incToggle}" data-filename="${ele1.path}">
+                        ${
+                            ele1.completed
+                                ? `<input type="checkbox" checked>`
+                                : `<input type="checkbox">`
+                        }
                         ${ele1.name}
                     </div> `;
                 })
@@ -150,7 +151,9 @@ const setHtml = () => {
     dropDown.innerHTML = htmlString;
     sideMenu();
     fun();
-    navbarName.innerText = localArr[0].folder[0].path.split("/")[0].toUpperCase();
+    navbarName.innerText = localArr[0].folder[0].path
+        .split("/")[0]
+        .toUpperCase();
 };
 
 // get folder index
@@ -169,36 +172,32 @@ function fun() {
     });
 }
 
-
 // Playing video
 function addVideo(e) {
-    console.log(e);
     let element = document.querySelector(`[data-filename="${e}"]`);
-    console.log(element);
     videoSrc.dataset.currentvideo = element.dataset.name;
     videoTitle.innerText = element.dataset.name.split(".")[1];
     saveToLocal("currentVideo", element.dataset.filename);
-    if (localStorage.getItem('currentVideo')) {
-        videoSrc.src = JSON.parse(localStorage.getItem('currentVideo'));
+    if (localStorage.getItem("currentVideo")) {
+        videoSrc.src = JSON.parse(localStorage.getItem("currentVideo"));
     } else {
         videoSrc.src = element.dataset.filename;
     }
     getComment(element);
 }
 
-
 // adding comment inside comment box
 const getComment = (element) => {
-    let data = JSON.parse(localStorage.getItem(localStorage.getItem('watching')));
-    console.log(data);
+    let data = JSON.parse(
+        localStorage.getItem(localStorage.getItem("watching"))
+    );
     let folderNumber = element.dataset.toggle;
     data[folderNumber].folder.map((video) => {
         if (video.path == element.dataset.filename) {
-            commentArea.value = video.comment? video.comment : "";
+            commentArea.value = video.comment ? video.comment : "";
         }
-    })
+    });
 };
-
 
 // side menu functions
 function sideMenu() {
@@ -218,7 +217,6 @@ function sideMenu() {
     }
 }
 
-
 // playing next video if a video is completed
 const nextVideo = (e) => {
     let crt = e.target.dataset.currentvideo;
@@ -235,19 +233,17 @@ const nextVideo = (e) => {
 
 // checking the checkbox if a video is completed and update it in local storage
 const completeVideo = (crtEle) => {
-    console.log(crtEle);
     let data = JSON.parse(localStorage.getItem(key));
     crtEle.querySelector("input").checked = true;
     let currentVideoPath = crtEle.dataset.filename;
     let folderNumber = crtEle.dataset.toggle;
-    data[folderNumber].folder.map(videoChecker => {
+    data[folderNumber].folder.map((videoChecker) => {
         if (videoChecker.path == currentVideoPath) {
             videoChecker.completed = true;
         }
-    })
+    });
     saveToLocal(`${localArr[0].folder[0].path.split("/")[0]}`, data);
-}
-
+};
 
 //if a course is saved in local storage
 if (localStorage.getItem("watching")) {
@@ -259,13 +255,11 @@ if (localStorage.getItem("watching")) {
         let crtEle = document.querySelector(
             `[data-name="${e.target.dataset.currentvideo}"]`
         );
-        // console.log(crtEle);
         completeVideo(crtEle);
         nextVideo(e);
     });
-    updateRecents(JSON.parse(localStorage.getItem('courses')));
+    updateRecents(JSON.parse(localStorage.getItem("courses")));
 }
-
 
 // Keyboard shortcuts
 const shortcut = (e) => {
@@ -288,47 +282,43 @@ const shortcut = (e) => {
     if (e.code == "KeyF") {
         videoSrc.requestFullscreen();
     }
-}
+};
 
 // adding a new course
 const addNew = (e) => {
     anchor.style.display = "none";
     uploader.style.display = "flex";
     videoSrc.pause();
-}
-
+};
 
 // change course
 const changeCourse = (e) => {
     setWatching(e.target.dataset.coursename);
     location.reload();
-}
-
-
+};
 
 // Saving a comment
 const saveComment = (e) => {
     let comment = document.querySelector("#floatingTextarea2").value;
-    let data = JSON.parse(localStorage.getItem(localStorage.getItem("watching")));
+    let data = JSON.parse(
+        localStorage.getItem(localStorage.getItem("watching"))
+    );
     let currentVideoPath = JSON.parse(localStorage.getItem("currentVideo"));
-    let folderNumber = document.querySelector(`[data-filename="${currentVideoPath}"]`).dataset.toggle;
-    console.log(folderNumber);
-    data[folderNumber].folder.map(videoChecker => {
+    let folderNumber = document.querySelector(
+        `[data-filename="${currentVideoPath}"]`
+    ).dataset.toggle;
+    data[folderNumber].folder.map((videoChecker) => {
         if (videoChecker.path == currentVideoPath) {
             videoChecker["comment"] = comment;
         }
-    })
-    console.log(data);
+    });
     saveToLocal(localStorage.getItem("watching"), data);
-}
-
+};
 
 // checking if a video has to be continued
-if (localStorage.getItem('currentVideo')) {
-    addVideo(JSON.parse(localStorage.getItem('currentVideo')));
+if (localStorage.getItem("currentVideo")) {
+    addVideo(JSON.parse(localStorage.getItem("currentVideo")));
 }
-
-
 
 // Event listeners
 
@@ -342,13 +332,19 @@ addNewCourse.addEventListener("click", addNew);
 document.querySelector("#saveComment").addEventListener("click", saveComment);
 
 // enabling key board shorcuts after entering a comment
-commentArea.addEventListener("blur", (e) => { document.addEventListener("keydown", shortcut); });
+commentArea.addEventListener("blur", (e) => {
+    document.addEventListener("keydown", shortcut);
+});
 
 //Changing a course
-recentCourseList.forEach(course => { course.addEventListener("click", changeCourse); });
+recentCourseList.forEach((course) => {
+    course.addEventListener("click", changeCourse);
+});
 
 //disabling keyboard shortcuts while commenting
-commentArea.addEventListener("focus", (e) => { document.removeEventListener("keydown", shortcut); });
+commentArea.addEventListener("focus", (e) => {
+    document.removeEventListener("keydown", shortcut);
+});
 
 //Keyboard shortcuts
-document.addEventListener('keydown', shortcut);
+document.addEventListener("keydown", shortcut);
